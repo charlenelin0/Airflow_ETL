@@ -6,7 +6,7 @@
 
 ## 簡介
 
-本專案旨在練習並實作資料工程常見技術，包括 Airflow 工作流編排、dbt 資料建模以及 ELT Pipeline 設計。
+本專案旨在實作資料工程常見技術，包括 Airflow 工作流編排、dbt 資料建模以及 ELT Pipeline 設計。
 
 資料處理流程如下：
 

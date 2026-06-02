@@ -26,8 +26,8 @@ default_args = {
 }
 
 failure_email = send_smtp_notification(
-            from_email='dog062106@gmail.com',
-            to = ['clin0621@gmail.com', 'linjpcharlene@gmail.com'],
+            from_email='example1@gmail.com',
+            to = ['example2.google.com'],
             subject = "[Airflow] DAG {{dag.dag_id}} Failed",
             html_content = """
             DAG: {{dag.dag_id}}<br>

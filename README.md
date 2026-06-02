@@ -75,16 +75,13 @@ Airflow Task：
 
 ```python
 scrape_weatherforecast()
+scrape_hightempalert()
 ```
 
 取得資料內容：
 
-- 地區名稱
-- 天氣現象
-- 最高溫
-- 最低溫
-- 降雨機率
-- 體感溫度
+- 一般天氣預報-今明 36 小時天氣預報
+- 天氣特報-高溫資訊
 
 ---
 
@@ -101,8 +98,7 @@ weather_forecast.json
 目的：
 
 - 保留原始資料
-- 支援資料追溯
-- 支援重新處理
+- 支援資料追溯 / 重新處理
 
 ---
 
@@ -120,8 +116,6 @@ trans_minio_silver()
 
 - JSON Flatten
 - 欄位命名標準化
-- 日期格式轉換
-- Null Value 處理
 
 輸出：
 

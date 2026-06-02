@@ -6,8 +6,7 @@
 
 ## 簡介
 
-本專案模擬現代資料工程（Data Engineering）實務流程，透過 Apache Airflow 定時擷取中央氣象署 Open Data API，<br>
-並依照 Bronze → Silver → Data Warehouse → Data Mart 的分層架構進行資料儲存與轉換。
+本專案旨在練習並實作資料工程常見技術，包括 Airflow 工作流編排、MinIO Data Lake、PostgreSQL Data Warehouse、dbt 資料建模以及 ELT Pipeline 設計。
 
 資料處理流程如下：
 

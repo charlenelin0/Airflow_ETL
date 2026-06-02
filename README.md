@@ -81,14 +81,13 @@ Airflow Task：
 
 ```python
 scrape_weatherforecast()
-
-scrape_hightempalert()
 ```
 
 取得資料內容：
 
-- 一般天氣預報-今明 36 小時天氣預報
-- 天氣特報-高溫資訊
+- 地區名稱
+- 最高溫
+- 最低溫
 
 ---
 
@@ -116,7 +115,7 @@ weather_forecast.json
 Airflow Task：
 
 ```python
-trans_minio_silver()
+trans_minio_silver_weather()
 ```
 
 處理內容：
@@ -137,13 +136,13 @@ weather_forecast.parquet
 Airflow Task：
 
 ```python
-ins_postgres_staging()
+ins_postgres_staging_forecast()
 ```
 
 目標資料表：
 
 ```sql
-stg_weather_forecast
+staging_forecast
 ```
 
 ---
@@ -196,7 +195,7 @@ ins_postgres_staging_alert()
 目標資料表：
 
 ```sql
-stg_weather_alert
+staging_alert
 ```
 
 ---
@@ -208,9 +207,9 @@ stg_weather_alert
 ```python
 bronzeForecast = scrape_weatherforecast()
 
-silverForecast = trans_minio_silver(bronzeForecast)
+silverForecast = trans_minio_silver_forecast(bronzeForecast)
 
-stagingForecast = ins_postgres_staging(silverForecast)
+stagingForecast = ins_postgres_staging_forecast(silverForecast)
 
 bronzeAlert = scrape_hightempalert()
 

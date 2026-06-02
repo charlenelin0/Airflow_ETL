@@ -21,31 +21,37 @@
 
 ## 系統架構
 
+## System Architecture
+
 ```text
-                     Weather API
-                          │
-                          ▼
+
                  Apache Airflow
-                          │
-            ┌─────────────┴─────────────┐
-            ▼                           ▼
-      Weather Forecast          High Temp Alert
-            │                           │
-            ▼                           ▼
-        Bronze Layer (Raw JSON in MinIO)
-                          │
-                          ▼
-        Silver Layer (Clean CSV in MinIO)
-                          │
-                          ▼
-          PostgreSQL Staging Tables
-                          │
-                          ▼
-                    dbt Models
-                          │
-                          ▼
-                    Data Mart
+                        │
+                        ▼
+                   Weather API
+                        │
+                        ▼
+      Bronze Layer (Raw JSON in MinIO)
+                        │
+                        ▼
+       Silver Layer (Parquet in MinIO)
+                        │
+                        ▼
+   PostgreSQL Data Warehouse (Staging)
+                        │
+                        ▼
+                 dbt Models
+                        │
+                        ▼
+        Fact / Dimension Models
+                        │
+                        ▼
+                   Data Mart
 ```
+
+Data Sources:
+- Weather Forecast
+- High Temperature Alert
 
 ---
 
@@ -120,8 +126,8 @@ trans_minio_silver()
 
 輸出：
 
-```csv
-weather_forecast.csv
+```parquet
+weather_forecast.parquet
 ```
 
 ---
@@ -252,13 +258,14 @@ fact_weather_alert
 
 <img width="1841" height="821" alt="Screenshot 2026-06-02 at 4 58 29 PM" src="https://github.com/user-attachments/assets/af091969-5754-4327-8254-5139f1230f4e" />
 
+
 提供後續 BI 與分析使用。
 
 ---
 
 ## 失敗通知機制
 
-為了提高 Pipeline 穩定性，當 Airflow Task 執行失敗時會自動寄送 Email。
+當 Airflow Task 執行失敗時會自動寄送 Email。
 
 設定：
 

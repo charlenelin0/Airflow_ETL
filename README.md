@@ -284,29 +284,15 @@ fact_weather_alert
 ## 專案結構
 
 ```text
-.
 ├── dags
-│   └── daily_quotes_ey.dag.py
-│
-├── include
-│   ├── api
-│   │   └── weather_api.py
-│   │
-│   ├── storage
-│   │   └── minio_client.py
-│   │
-│   ├── transform
-│   │   └── weather_transform.py
-│   │
-│   └── __init__.py
-│
+│   ├── weather_data_pipeline.py
+│   └── include
+│       ├── api
+│       ├── storage
+│       └── transform
 ├── dbt
-│   └── weather_project
-│
 ├── logs
-│
 ├── plugins
-│
 └── docker-compose.yml
 ```
 
@@ -342,37 +328,6 @@ dbt docs serve
 
 ---
 
-## 專案特色
-
-### Data Lake + Data Warehouse 架構
-
-採用業界常見資料分層：
-
-```text
-API
- ↓
-Bronze
- ↓
-Silver
- ↓
-Warehouse
- ↓
-Mart
-```
-
----
-
-### 自動化資料處理
-
-透過 Airflow 實現：
-
-- 自動排程
-- 自動轉換
-- 自動載入
-- 自動通知
-
----
-
 ## 學習成果
 
 本專案實作並熟悉以下技術：
@@ -382,9 +337,7 @@ Mart
 - MinIO
 - PostgreSQL
 - dbt
-- Docker
 - ELT Pipeline
-- Failure Alerting
 
 ---
 

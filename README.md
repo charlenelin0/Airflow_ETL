@@ -244,11 +244,13 @@ stg_weather_alert
 ### Mart Layer
 
 ```text
+dim_city
+dim_area
 fact_weather_forecast
 fact_weather_alert
 ```
 
-<img width="1821" height="806" alt="image" src="https://github.com/user-attachments/assets/04bb44ce-f02d-4460-965b-6bbb1f5fbff3" />
+<img width="1841" height="821" alt="Screenshot 2026-06-02 at 4 58 29 PM" src="https://github.com/user-attachments/assets/af091969-5754-4327-8254-5139f1230f4e" />
 
 提供後續 BI 與分析使用。
 

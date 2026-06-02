@@ -218,6 +218,8 @@ stagingAlert = ins_postgres_staging_alert(silverAlert)
 dbt_job = run_dbt()
 ```
 
+<img width="1440" height="789" alt="weather_data_pipeline-graph" src="https://github.com/user-attachments/assets/873700c3-b844-4d97-b63b-17fb6d672f6d" />
+
 ---
 
 ## dbt 建模

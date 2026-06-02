@@ -200,11 +200,11 @@ stg_weather_alert
 本專案採用 TaskFlow API 開發。
 
 ```python
-bronze = scrape_weatherforecast()
+bronzeForecast = scrape_weatherforecast()
 
-silver = trans_minio_silver(bronze)
+silverForecast = trans_minio_silver(bronzeForecast)
 
-staging = ins_postgres_staging(silver)
+stagingForecast = ins_postgres_staging(silverForecast)
 
 bronzeAlert = scrape_hightempalert()
 
@@ -213,6 +213,9 @@ silverAlert = trans_minio_silver_alert(bronzeAlert)
 stagingAlert = ins_postgres_staging_alert(silverAlert)
 
 dbt_job = run_dbt()
+
+[stagingAlert, stagingForecast] >> dbt_job
+
 ```
 
 <img width="1440" height="789" alt="weather_data_pipeline-graph" src="https://github.com/user-attachments/assets/873700c3-b844-4d97-b63b-17fb6d672f6d" />

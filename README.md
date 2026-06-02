@@ -277,7 +277,9 @@ fact_weather_alert
 - DAG Name
 - Task Name
 - Execution Date
-- Error Message
+
+<img width="1563" height="428" alt="image" src="https://github.com/user-attachments/assets/752f1a78-1c37-42d0-acf6-ab2e74a73005" />
+
 
 ---
 

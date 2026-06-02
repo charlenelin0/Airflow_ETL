@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw_data
+    database: test
+    schema: public
+
+    tables:
+    - name: staging_forecast
+    - name: staging_alert

@@ -390,8 +390,6 @@ transform/
 - dbt
 - Docker
 - ELT Pipeline
-- Data Lake Architecture
-- Data Warehouse Design
 - Failure Alerting
 
 ---
@@ -399,9 +397,6 @@ transform/
 ## 未來優化方向
 
 - Incremental Model
-- dbt Test Coverage
-- Source Freshness Check
-- Great Expectations
+- Test Coverage
 - GitHub Actions CI/CD
-- Kubernetes Deployment
-- Data Lineage Dashboard
+  

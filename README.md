@@ -246,6 +246,8 @@ fact_weather_forecast
 fact_weather_alert
 ```
 
+<img width="1821" height="806" alt="image" src="https://github.com/user-attachments/assets/04bb44ce-f02d-4460-965b-6bbb1f5fbff3" />
+
 提供後續 BI 與分析使用。
 
 ---

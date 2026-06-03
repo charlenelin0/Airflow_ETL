@@ -216,13 +216,18 @@ silverAlert = trans_minio_silver_alert(bronzeAlert)
 
 stagingAlert = ins_postgres_staging_alert(silverAlert)
 
+running = update_pipeline_running()
+
 dbt_job = run_dbt()
 
-[stagingAlert, stagingForecast] >> dbt_job
+success = update_pipeline_success()
 
+running >> [bronzeForecast, bronzeAlert]
+
+[stagingForecast, stagingAlert] >> dbt_job >> success
 ```
 
-<img width="1440" height="789" alt="weather_data_pipeline-graph" src="https://github.com/user-attachments/assets/873700c3-b844-4d97-b63b-17fb6d672f6d" />
+<img width="1050" height="808" alt="weather_data_pipeline-graph (1)" src="https://github.com/user-attachments/assets/625225d3-4514-4561-aada-14469c8e02a6" />
 
 ---
 

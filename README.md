@@ -308,10 +308,24 @@ fact_weather_alert
 docker compose up -d
 ```
 
-### 手動觸發 DAG
+### 啟動 MinIO
 
 ```bash
-airflow dags trigger weather_data_pipeline
+docker start minio
+```
+
+### 觸發 Pipeline
+
+開啟 Airflow Web UI：
+
+```text
+http://localhost:8080
+```
+
+手動執行 DAG：
+
+```text
+weather_data_pipeline
 ```
 
 ### 執行 dbt
@@ -320,9 +334,12 @@ airflow dags trigger weather_data_pipeline
 cd dbt/jaffle_shop
 
 dbt run
+```
 
+### 產生 dbt 文件
+
+```bash
 dbt docs generate
-
 dbt docs serve
 ```
 

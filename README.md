@@ -292,6 +292,11 @@ fact_weather_alert
 │       ├── storage
 │       └── transform
 ├── dbt
+│   └── jaffle_shop
+│       └── models
+│           ├── marts
+│           └── staging
+│
 └── docker-compose.yml
 ```
 

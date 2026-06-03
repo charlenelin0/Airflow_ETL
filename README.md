@@ -292,8 +292,6 @@ fact_weather_alert
 │       ├── storage
 │       └── transform
 ├── dbt
-├── logs
-├── plugins
 └── docker-compose.yml
 ```
 

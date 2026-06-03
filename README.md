@@ -266,6 +266,23 @@ fact_weather_alert
 
 ---
 
+## Pipeline State Tracking
+
+新增 ETL Metadata Tracking 機制，用於記錄 Pipeline 執行狀態與處理結果。
+
+記錄內容包含：
+
+- Pipeline Status（RUNNING / SUCCESS）
+- Processed Row Count
+- Last Processed Time（Watermark）
+- Last Run Time
+
+|pipeline_name|last_processed_at|last_run_at|status|row_count|created_at|updated_at|
+|-------------|-----------------|-----------|------|---------|----------|----------|
+|weather_data_pipeline|2026-06-03 17:16:33.000 +0800|2026-06-03 17:16:35.016 +0800|SUCCESS|218|2026-06-03 16:51:49.966 +0800|2026-06-03 17:16:44.134 +0800|
+
+---
+
 ## 失敗通知機制
 
 當 Airflow Task 執行失敗時會自動寄送 Email。
@@ -283,7 +300,6 @@ fact_weather_alert
 - Execution Date
 
 <img width="1563" height="428" alt="image" src="https://github.com/user-attachments/assets/752f1a78-1c37-42d0-acf6-ab2e74a73005" />
-
 
 ---
 

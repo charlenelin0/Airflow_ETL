@@ -311,13 +311,13 @@ docker compose up -d
 ### 手動觸發 DAG
 
 ```bash
-airflow dags trigger daily_quotes_ey
+airflow dags trigger weather_data_pipeline
 ```
 
 ### 執行 dbt
 
 ```bash
-cd dbt/weather_project
+cd dbt/jaffle_shop
 
 dbt run
 
@@ -345,7 +345,8 @@ dbt docs serve
 
 ## 未來優化方向
 
-- Incremental Model
-- Test Coverage
-- GitHub Actions CI/CD
+- Add dbt Tests and data validation.
+- Implement GitHub Actions CI/CD.
+- Refactor dbt project structure.
+- Refactor Airflow shared modules (`include`).
   

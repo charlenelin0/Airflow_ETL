@@ -10,12 +10,11 @@
 
 資料處理流程如下：
 
-- 透過 [中央氣象署開放資料平臺 API](https://opendata.cwa.gov.tw/dist/opendata-swagger.html) 定期擷取天氣預報與高溫警報資料
+- 透過 [中央氣象署開放資料平臺 API](https://opendata.cwa.gov.tw/dist/opendata-swagger.html) 定期擷取（Extract）天氣預報與高溫警報資料
 - 將原始資料以 JSON 格式存放於 MinIO Data Lake Bronze Layer，保留完整來源資料供追溯與重跑使用
-- 進行資料展平、欄位標準化及結構化轉換，並以 Parquet 格式存放於 MinIO Data Lake Silver Layer
-- 將整理後的資料載入 PostgreSQL Data Warehouse 的 Staging Layer
-- 使用 dbt 建立 Fact / Dimension Model，實作資料建模（Data Modeling）與商業邏輯轉換
-- 建立完整 ELT（Extract, Load, Transform）資料管線，提供天氣資料分析與查詢使用
+- 將巢狀 JSON 資料展平，萃取所需欄位並轉換為 Parquet 格式，存放於 MinIO Data Lake Silver Layer
+- 將整理後的資料載入（Load）PostgreSQL Data Warehouse 的 Staging Layer
+- 使用 dbt 實作資料建模（Data Modeling）與商業邏輯轉換（Transform），建立 Fact / Dimension Model 與 Data Mart，供後續資料分析與查詢使用
   
 ---
 

@@ -314,10 +314,12 @@ Fact Tables
 │       └── transform
 ├── dbt
 │   └── weather_data_platform
+│       ├── dbt_project.yml
 │       ├── macros
 │       └── models
-│           ├── intermediate
 │           ├── staging
+│           │   └── source.yml
+│           ├── intermediate
 │           └── marts
 └── docker-compose.yml
 ```

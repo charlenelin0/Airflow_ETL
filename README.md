@@ -239,30 +239,35 @@ running >> [bronzeForecast, bronzeAlert]
 
 產生：
 
-### Staging Layer
+### Staging Layer (Views)：資料清洗與標準化
+
+Basic data cleansing, standardization and type conversion.
 
 - stg_weather_forecast
 - stg_weather_alert
 
-### Intermediate Layer
+### Intermediate Layer (Ephemeral Models)：商業邏輯轉換
+
+Business transformations, aggregations and reusable logic compiled into CTEs at runtime.
 
 - eph_weather_forecast
+- eph_weather_alert
 
-### Mart Layer
+### Mart Layer (Tables)：資料倉儲模型，提供 BI 與資料分析使用
 
-Dimension Tables
+Business-ready dimensional models for analytics and reporting.
+
+#### Dimension Tables
 
 - dim_city
 - dim_area
 
-Fact Tables
+#### Fact Tables
 
 - fact_weather_forecast
 - fact_weather_alert
 
-提供後續 BI 與分析使用。
-
-<img width="1857" height="884" alt="image" src="https://github.com/user-attachments/assets/bea50543-84df-403c-8f5d-419e6f3e7dba" />
+<img width="1759" height="784" alt="image" src="https://github.com/user-attachments/assets/92c1eee0-6221-4ce5-964b-520950d8164b" />
 
 ---
 

@@ -7,8 +7,8 @@ from airflow.providers.smtp.notifications.smtp import send_smtp_notification
 from include.api.weather_forecast.api_temp import request_api as get_temp_api
 from include.api.weather_forecast.api_temp_alert import request_api as get_temp_alert_api
 
-from include.storage.minio_bronze import get_json_from_minio, upload_json_to_minio
-from include.storage.minio_silver import get_parquet_from_minio, upload_parquet_to_minio
+from include.storage.minio_bronze import get_json_from_minio, upload_json_to_minio, delete_json_from_minio
+from include.storage.minio_silver import get_parquet_from_minio, upload_parquet_to_minio, delete_parquet_from_minio
 from include.storage.pipeline_state import update_pipeline_state, get_row_count
 
 from include.transform.transform_temp import trans_to_df as trans_temp
@@ -242,6 +242,14 @@ def weather_data_pipeline() -> None:
             last_processed_at = batch_datetime
         )
 
+    @task()
+    def cleanup_bronze_files() -> None:
+        delete_json_from_minio()
+
+    @task()
+    def cleanup_silver_files() -> None:
+        delete_parquet_from_minio()
+
     running = update_pipeline_running()
 
     # weather forecast
@@ -257,9 +265,12 @@ def weather_data_pipeline() -> None:
     dbt_job = run_dbt()
 
     success = update_pipeline_success()
+    
+    clean_bronze = cleanup_bronze_files()
+    clean_silver = cleanup_silver_files()
 
     running >> [bronzeForecast, bronzeAlert]
 
-    [stagingAlert, stagingForecast] >> dbt_job >> success
+    [stagingAlert, stagingForecast] >> dbt_job >> success >> [clean_bronze, clean_silver]
 
 weather_data_pipeline()

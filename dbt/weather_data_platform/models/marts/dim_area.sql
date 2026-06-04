@@ -13,8 +13,8 @@ select distinct left(area, 3) as city, substring(area from 4) as area
 )
 
 {% if is_incremental() %}
-where area not in (
-    select area
+where md5(city || area) not in (
+    select area_key
       from {{ this }}
 )
 {% endif %}

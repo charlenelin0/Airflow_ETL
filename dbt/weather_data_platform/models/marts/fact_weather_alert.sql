@@ -1,3 +1,5 @@
+-- models/marts/fact_weather_alert.sql
+
 {{
     config(materialized="table")
 }}

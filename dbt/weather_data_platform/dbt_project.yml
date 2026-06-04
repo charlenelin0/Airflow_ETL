@@ -1,6 +1,6 @@
-name: jaffle_shop
+name: weather_data_platform
 
-profile: jaffle_shop
+profile: weather_data_platform
 
 seed-paths: ["seeds"]
 model-paths: ["models"]
@@ -11,11 +11,11 @@ clean-targets:
 
 seeds:
   # Builds seeds into '<your_schema_name>_raw'
-  jaffle_shop:
+  weather_data_platform:
     +schema: raw
 
 models:
-  jaffle_shop:
+  weather_data_platform:
     +static_analysis: strict
     # Materialize staging models as views, and marts as tables
     staging:

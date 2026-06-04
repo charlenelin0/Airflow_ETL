@@ -1,3 +1,5 @@
+-- models/staging/stg_weather_alert.sql
+
 {{
     config(materialized="view")
 }}

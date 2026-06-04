@@ -1,7 +1,7 @@
--- models/marts/mart_weather.sql
+-- models/intermediate/eph_weather_forecast.sql
 
 {{ 
-     config(materialized='table') 
+     config(materialized='ephemeral') 
 }}
 
 select 

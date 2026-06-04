@@ -219,7 +219,7 @@ def weather_data_pipeline() -> None:
                 "dbt",
                 "run",
                 "--project-dir",
-                "/opt/airflow/dbt/jaffle_shop",
+                "/opt/airflow/dbt/weather_data_platform",
                 "--profiles-dir",
                 "/opt/airflow/dbt/profiles"
             ],

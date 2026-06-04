@@ -367,6 +367,40 @@ dbt docs generate
 dbt docs serve
 ```
 
+### 切換 dbt Target
+
+dbt Model 的輸出位置由本機 `~/.dbt/profiles.yml` 中的 `database` 與 `schema` 設定決定。
+
+開啟設定檔：
+
+```bash
+code ~/.dbt/profiles.yml
+```
+
+例如：
+
+```yaml
+outputs:
+  dev:
+    database: test
+    schema: mart
+```
+
+執行後 Model 會建立於：
+
+```text
+test.mart
+```
+
+若需切換輸出位置，只需修改：
+
+```yaml
+database: analytics
+schema: mart
+```
+
+> Source 定義資料來源位置；Target 決定 dbt Model 的輸出位置。
+
 ---
 
 ## 學習成果

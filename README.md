@@ -222,12 +222,15 @@ dbt_job = run_dbt()
 
 success = update_pipeline_success()
 
+clean_bronze = cleanup_bronze_files()
+clean_silver = cleanup_silver_files()
+
 running >> [bronzeForecast, bronzeAlert]
 
-[stagingForecast, stagingAlert] >> dbt_job >> success
+[stagingForecast, stagingAlert] >> dbt_job >> success >> [clean_bronze, clean_silver]
 ```
 
-<img width="1050" height="808" alt="weather_data_pipeline-graph (1)" src="https://github.com/user-attachments/assets/625225d3-4514-4561-aada-14469c8e02a6" />
+<img width="1065" height="808" alt="weather_data_pipeline-graph (1)" src="https://github.com/user-attachments/assets/50da362f-c760-46e0-b048-3127cdbc5238" />
 
 ---
 

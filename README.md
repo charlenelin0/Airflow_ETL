@@ -223,6 +223,7 @@ dbt_job = run_dbt()
 success = update_pipeline_success()
 
 clean_bronze = cleanup_bronze_files()
+
 clean_silver = cleanup_silver_files()
 
 running >> [bronzeForecast, bronzeAlert]

@@ -272,10 +272,16 @@ Fact Tables
 
 記錄內容包含：
 
-- Pipeline Status（RUNNING / SUCCESS）
-- Processed Row Count
-- Last Processed Time（Watermark）
-- Last Run Time
+| 欄位                  | 說明                         |
+| ------------------- | -------------------------- |
+| pipeline_name       | Pipeline 名稱                |
+| status              | RUNNING / SUCCESS / FAILED |
+| row_count | 本次處理筆數                     |
+| last_processed_time | Watermark（來源資料最新時間）        |
+| last_run_time       | 最近一次成功執行時間                 |
+| created_at          | Pipeline 建立時間              |
+| updated_at          | Pipeline 狀態最後更新時間          |
+
 
 |pipeline_name|last_processed_at|last_run_at|status|row_count|created_at|updated_at|
 |-------------|-----------------|-----------|------|---------|----------|----------|

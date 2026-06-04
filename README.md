@@ -239,34 +239,32 @@ running >> [bronzeForecast, bronzeAlert]
 
 資料進入 PostgreSQL 後，由 dbt 進行轉換。
 
-執行：
-
-```bash
-dbt run
-```
-
 產生：
 
 ### Staging Layer
 
-```text
-stg_weather_forecast
-stg_weather_alert
-```
+- stg_weather_forecast
+- stg_weather_alert
+
+### Intermediate Layer
+
+- eph_weather_forecast
 
 ### Mart Layer
 
-```text
-dim_city
-dim_area
-fact_weather_forecast
-fact_weather_alert
-```
+Dimension Tables
 
-<img width="1841" height="821" alt="Screenshot 2026-06-02 at 4 58 29 PM" src="https://github.com/user-attachments/assets/af091969-5754-4327-8254-5139f1230f4e" />
+- dim_city
+- dim_area
 
+Fact Tables
+
+- fact_weather_forecast
+- fact_weather_alert
 
 提供後續 BI 與分析使用。
+
+<img width="1857" height="884" alt="image" src="https://github.com/user-attachments/assets/bea50543-84df-403c-8f5d-419e6f3e7dba" />
 
 ---
 
@@ -317,11 +315,12 @@ fact_weather_alert
 │       ├── storage
 │       └── transform
 ├── dbt
-│   └── jaffle_shop
+│   └── weather_data_platform
+│       ├── macros
 │       └── models
-│           ├── marts
-│           └── staging
-│
+│           ├── intermediate
+│           ├── staging
+│           └── marts
 └── docker-compose.yml
 ```
 
@@ -358,7 +357,7 @@ weather_data_pipeline
 ### 執行 dbt
 
 ```bash
-cd dbt/jaffle_shop
+cd dbt/weather_data_platform
 
 dbt run
 ```
@@ -389,6 +388,5 @@ dbt docs serve
 
 - Add dbt Tests and data validation.
 - Implement GitHub Actions CI/CD.
-- Refactor dbt project structure.
 - Refactor Airflow shared modules (`include`).
   

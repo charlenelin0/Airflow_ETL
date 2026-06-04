@@ -20,8 +20,6 @@
 
 ## 系統架構
 
-## System Architecture
-
 ```text
 
                  Apache Airflow

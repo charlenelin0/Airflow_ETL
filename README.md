@@ -273,7 +273,7 @@ Business-ready dimensional models for analytics and reporting.
 
 ## Data Governance & Documentation 資料治理與文件化
 
-本專案透過 dbt Metadata 管理機制，建立資料來源定義、模型文件與資料血緣追蹤，提升資料治理（Data Governance）、文件化（Documentation）與資料維護性（Maintainability）。
+透過 dbt Metadata 管理機制，建立資料來源定義、模型與欄位文件、資料血緣追蹤（Data Lineage）及資料品質驗證（Data Quality Tests），提升資料可維護性與治理能力。
 
 包含：
 

@@ -18,6 +18,20 @@
   
 ---
 
+## 技術架構
+
+| 類別 | 技術 |
+|--------|--------|
+| Workflow Orchestration | Apache Airflow |
+| Programming Language | Python |
+| Data Lake | MinIO |
+| Data Warehouse | PostgreSQL |
+| Data Transformation | dbt |
+| Containerization | Docker |
+| Notification | SMTP Email |
+
+---
+
 ## 系統架構
 
 ```text
@@ -49,20 +63,6 @@
 Data Sources:
 - Weather Forecast
 - High Temperature Alert
-
----
-
-## 技術架構
-
-| 類別 | 技術 |
-|--------|--------|
-| Workflow Orchestration | Apache Airflow |
-| Programming Language | Python |
-| Data Lake | MinIO |
-| Data Warehouse | PostgreSQL |
-| Data Transformation | dbt |
-| Containerization | Docker |
-| Notification | SMTP Email |
 
 ---
 
@@ -268,6 +268,23 @@ Business-ready dimensional models for analytics and reporting.
 - fact_weather_alert
 
 <img width="1759" height="784" alt="image" src="https://github.com/user-attachments/assets/92c1eee0-6221-4ce5-964b-520950d8164b" />
+
+---
+
+## Data Governance & Documentation
+
+本專案透過 dbt Metadata 管理機制，建立資料來源定義、模型文件與資料血緣追蹤，提升資料治理（Data Governance）、文件化（Documentation）與資料維護性（Maintainability）。
+
+包含：
+
+- Source Definitions（資料來源定義）
+- Model Descriptions（模型說明）
+- Column-Level Documentation（欄位文件）
+- Model Tags（模型標籤管理）
+- Data Lineage Tracking（資料血緣追蹤）
+- Data Quality Tests（資料品質驗證）
+
+<img width="1227" height="757" alt="image" src="https://github.com/user-attachments/assets/99ea187c-b46d-4a63-b108-db73e9419a02" />
 
 ---
 

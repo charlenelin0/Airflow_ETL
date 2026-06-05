@@ -271,7 +271,7 @@ Business-ready dimensional models for analytics and reporting.
 
 ---
 
-## Data Governance & Documentation
+## Data Governance & Documentation 資料治理與文件化
 
 本專案透過 dbt Metadata 管理機制，建立資料來源定義、模型文件與資料血緣追蹤，提升資料治理（Data Governance）、文件化（Documentation）與資料維護性（Maintainability）。
 
@@ -288,9 +288,9 @@ Business-ready dimensional models for analytics and reporting.
 
 ---
 
-## Pipeline State Tracking
+## Pipeline 狀態監控與追蹤
 
-新增 ETL Metadata Tracking 機制，用於記錄 Pipeline 執行狀態與處理結果。
+新增 ETL Tracking 機制，用於記錄 Pipeline 執行狀態與處理結果。
 
 記錄內容包含：
 

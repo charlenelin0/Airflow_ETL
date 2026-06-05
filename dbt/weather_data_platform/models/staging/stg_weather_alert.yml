@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_weather_alert
+    config:
+      tags:
+        - weather
+        - alert
+    description: Cleaned and standardized weather alert data.
+
+    columns:
+      - name: event
+        description:  Weather alert event.
+      
+      - name: area 
+        description: Affected area.
+        tests:
+          - not_null
+
+      - name: level 
+        description: Alert severity level.
+
+      - name: weather_date
+        description: Alert date derived from date.

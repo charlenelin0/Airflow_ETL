@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stg_weather_forecast
+    config:
+      tags:
+        - weather
+        - forecast
+    description: Cleaned and standardized weather forecast data.
+
+    columns:
+      - name: city
+        description: City name.
+        tests:
+          - not_null
+
+      - name: type 
+        description: Weather element type.
+
+      - name: weather_date
+        description: Forecast date derived from start_time.
+
+      - name: temp
+        description: Forecast temperature in Celsius.

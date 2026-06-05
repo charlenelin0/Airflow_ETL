@@ -1,10 +1,35 @@
 version: 2
 
 sources:
+
   - name: raw_data
     database: test
     schema: public
+    description: Raw weather data loaded from Postgres
 
     tables:
     - name: staging_forecast
+      description: Raw weather forecast data.
+
+      columns:
+      - name: city
+        description: City name.
+      - name: type
+        description: Weather element type.
+      - name: start_time
+        description: Forecast start time.
+      - name: temp
+        description: Forecast temperature in Celsius.
+
     - name: staging_alert
+      description: Raw weather alert data.
+
+      columns:
+      - name: event
+        description: Alert event name.
+      - name: level
+        description: Alert severity level.
+      - name: area
+        description: Affected area.
+      - name: date
+        description: Alert issued date.

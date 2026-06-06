@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: fact_weather_forecast
+    config:
+      tags:
+        - fact
+        - weather
+        - forecast
+    description: Fact table containing weather forecast records.
+
+    columns:
+      - name: city_key
+        description: Foreign key to dim_city.
+        tests:
+          - not_null
+      
+      - name: weather_date 
+        description: Alert date.
+
+      - name: avg_LowestTemp 
+        description: Average forecasted lowest temperature in Celsius.
+
+      - name: avg_HighestTemp 
+        description: Average forecasted highest temperature in Celsius.
+
+      - name: flag_HighestTemp 
+        description: Indicator of high temperature condition.

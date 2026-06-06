@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: dim_city
+    config:
+      tags:
+        - dim
+        - city
+    description: City dimension table for weather alert analytics.
+
+    columns:
+      - name: city_key
+        description: Surrogate key for city.
+        tests:
+          - unique
+          - not_null
+      
+      - name: city 
+        description: City name.

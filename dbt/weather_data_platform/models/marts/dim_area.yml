@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: dim_area
+    config:
+      tags:
+        - dim
+        - area
+    description: Area dimension table for weather alert analytics.
+
+    columns:
+      - name: area_key
+        description: Surrogate key for area.
+        tests:
+          - unique
+          - not_null
+      
+      - name: city 
+        description: City name.
+      
+      - name: area 
+        description: Area name.

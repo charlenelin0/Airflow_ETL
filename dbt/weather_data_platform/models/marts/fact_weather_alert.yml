@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: fact_weather_alert
+    config:
+      tags:
+        - fact
+        - weather
+        - alert
+    description: Fact table containing weather alert events.
+
+    columns:
+      - name: city_key
+        description: Foreign key to dim_city.
+        tests:
+          - not_null
+      
+      - name: area_key 
+        description: Foreign key to dim_city.
+        tests:
+          - not_null
+      
+      - name: weather_date 
+        description: Alert date.
+
+      - name: event 
+        description: Weather alert event.
+
+      - name: level 
+        description: Alert severity level.

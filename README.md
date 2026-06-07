@@ -1,12 +1,12 @@
 # Weather Data Platform
 
-使用 Airflow、MinIO、PostgreSQL 與 dbt 建置的端到端天氣資料平台。
+使用 Airflow、MinIO、PostgreSQL 與 dbt 建置的天氣資料平台。
 
 ---
 
 ## 簡介
 
-本專案旨在實作資料工程常用開源技術，包括 Apache Airflow 排程管理、dbt 資料建模，以及 ELT Pipeline 設計與實作。
+本專案使用 Apache Airflow、dbt、MinIO 與 PostgreSQL 建置 ELT Pipeline，實作資料擷取、轉換與建模流程。
 
 資料處理流程如下：
 
@@ -26,7 +26,7 @@
 | Programming Language | Python |
 | Data Lake | MinIO |
 | Data Warehouse | PostgreSQL |
-| Data Transformation | dbt |
+| Data Transformation, Modeling & Governance | dbt |
 | Containerization | Docker |
 | Notification | SMTP Email |
 

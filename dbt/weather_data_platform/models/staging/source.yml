@@ -3,9 +3,22 @@ version: 2
 sources:
 
   - name: raw_data
-    database: test
-    schema: public
-    description: Raw weather data loaded from Postgres
+    
+    # Postgres
+    # database: test
+    # schema: public
+    # description: Raw weather data loaded from Postgres
+
+    database: "{% if target.name == 'bigquery' %}bq-test-499005{% else %}test{% endif %}"
+    
+    schema: "{% if target.name == 'bigquery' %}weather_platform{% else %}public{% endif %}"
+    
+    description: >
+      {% if target.name == 'bigquery' %}
+      Raw weather data loaded from Bigquery
+      {% else %}
+      Raw weather data loaded from Postgres
+      {% endif %}
 
     tables:
     - name: staging_forecast

@@ -4,5 +4,15 @@
     config(materialized="view")
 }}
 
-select event, level, area, start_time::date as weather_date
+select 
+    event, 
+    level, 
+    area,
+
+    {% if target.name == 'bigquery' %}
+        DATE(start_time) as weather_date
+    {% else %}
+        start_time::date as weather_date
+    {% endif %}
+
   from {{ source('raw_data', 'staging_alert') }}

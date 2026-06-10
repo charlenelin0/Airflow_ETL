@@ -5,6 +5,6 @@
 }}
 
 select event, level, area, weather_date,
-       left(area, 3) as city, 
-       substring(area from 4) as district
+       substr(area, 1, 3) as city, 
+       substr(area, 4) as district
   from {{ ref('stg_weather_alert') }}

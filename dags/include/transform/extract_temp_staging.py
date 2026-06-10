@@ -36,7 +36,7 @@ def insert_into_local_staging(file_path: str, batch_time: str) -> None:
     cursor.execute(
         f"""
         DELETE FROM public.{table_name}
-        WHERE batch_time = %s
+         WHERE batch_time = %s
         """,
         (batch_time,)
     )

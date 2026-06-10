@@ -15,6 +15,8 @@ from include.transform.transform_temp import trans_to_df as trans_temp
 from include.transform.transform_temp_alert import trans_to_df as trans_temp_alert
 from include.transform.extract_temp_staging import insert_into_local_staging as extract_temp_staging
 from include.transform.extract_temp_alert_staging import insert_into_local_staging as extract_temp_alert_staging
+from include.transform.load_bigquery_alert import load_bigquery_alert as load_alert_bigquery
+from include.transform.load_bigquery_forecast import load_bigquery_forecast as load_temp_bigquery
 
 import json
 import subprocess
@@ -212,6 +214,24 @@ def weather_data_pipeline() -> None:
         finally:
             shutil.rmtree(tmp_dir)
 
+    @task()
+    def ins_bigquery_staging_forecast() -> None:
+
+        # get flow time
+        context = get_current_context()
+        batch_datetime = context['ts']
+
+        load_temp_bigquery(batch_time = batch_datetime)
+    
+    @task()
+    def ins_bigquery_staging_alert() -> None:
+        
+        # get flow time
+        context = get_current_context()
+        batch_datetime = context['ts']
+
+        load_alert_bigquery(batch_time = batch_datetime)
+
     @task(on_failure_callback=[failure_email])
     def run_dbt() -> None:
         subprocess.run(
@@ -262,6 +282,10 @@ def weather_data_pipeline() -> None:
     silverAlert = trans_minio_silver_alert(bronzeAlert)
     stagingAlert = ins_postgres_staging_alert(silverAlert)
 
+    # bigquery
+    bigqueryForecast = ins_bigquery_staging_forecast()
+    bigqueryAlert = ins_bigquery_staging_alert()
+
     dbt_job = run_dbt()
 
     success = update_pipeline_success()
@@ -269,8 +293,14 @@ def weather_data_pipeline() -> None:
     clean_bronze = cleanup_bronze_files()
     clean_silver = cleanup_silver_files()
 
+    # flow
     running >> [bronzeForecast, bronzeAlert]
 
-    [stagingAlert, stagingForecast] >> dbt_job >> success >> [clean_bronze, clean_silver]
+    stagingAlert >> bigqueryForecast
+    stagingForecast >> bigqueryAlert
+    
+    [bigqueryForecast, bigqueryAlert] >> dbt_job
+    dbt_job >> success
+    success >> [clean_bronze, clean_silver]
 
 weather_data_pipeline()

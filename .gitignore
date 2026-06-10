@@ -27,6 +27,7 @@ logs/
 airflow.db
 airflow.cfg
 webserver_config.py
+config/*.json
 
 # dbt
 target/

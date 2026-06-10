@@ -5,4 +5,5 @@ apache-airflow-providers-amazon
 beautifulsoup4
 dbt-core
 dbt-postgres
+dbt-bigquery
 google-cloud-bigquery

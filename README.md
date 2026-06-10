@@ -399,7 +399,7 @@ dbt docs serve
 
 ### 切換 dbt Target
 
-dbt Model 的輸出位置由本機 `~/.dbt/profiles.yml` 中的 `database` 與 `schema` 設定決定。
+dbt Model 的輸出位置由 `~/.dbt/profiles.yml` 中的 `database` 與 `schema` 設定決定。
 
 開啟設定檔：
 

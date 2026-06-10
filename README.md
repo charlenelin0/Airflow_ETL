@@ -13,22 +13,23 @@
 - 透過 [中央氣象署開放資料平臺 API](https://opendata.cwa.gov.tw/dist/opendata-swagger.html) 定期擷取（Extract）天氣預報與高溫警報資料
 - 將原始資料以 JSON 格式存放於 MinIO Data Lake Bronze Layer，保留完整來源資料供追溯與重跑使用
 - 將巢狀 JSON 資料展平，萃取所需欄位並轉換為 Parquet 格式，存放於 MinIO Data Lake Silver Layer
-- 將整理後的資料載入（Load）PostgreSQL Data Warehouse 的 Staging Layer
+- 將整理後的資料載入（Load）Data Warehouse
 - 使用 dbt 實作資料建模（Data Modeling）與商業邏輯轉換（Transform），建立 Fact / Dimension Model 與 Data Mart，供後續資料分析與查詢使用
   
 ---
 
 ## 技術架構
 
-| 類別 | 技術 |
-|--------|--------|
-| Workflow Orchestration | Apache Airflow |
-| Programming Language | Python |
-| Data Lake | MinIO |
-| Data Warehouse | PostgreSQL |
-| Data Transformation, Modeling & Governance | dbt |
-| Containerization | Docker |
-| Notification | SMTP Email |
+| Category                       | Technology     |
+| ------------------------------ | -------------- |
+| Workflow Orchestration         | Apache Airflow |
+| Programming Language           | Python         |
+| Data Lake                      | MinIO          |
+| Staging Data Warehouse         | PostgreSQL     |
+| Cloud Data Warehouse           | BigQuery       |
+| Data Transformation & Modeling | dbt            |
+| Containerization               | Docker         |
+| Notification                   | SMTP Email     |
 
 ---
 
@@ -49,6 +50,9 @@
                         │
                         ▼
    PostgreSQL Data Warehouse (Staging)
+                        │
+                        ▼
+          BigQuery Data Warehouse
                         │
                         ▼
                  dbt Models
@@ -201,61 +205,25 @@ staging_alert
 
 本專案採用 TaskFlow API 開發。
 
-```python
-bronzeForecast = scrape_weatherforecast()
-
-silverForecast = trans_minio_silver_forecast(bronzeForecast)
-
-stagingForecast = ins_postgres_staging_forecast(silverForecast)
-
-bronzeAlert = scrape_hightempalert()
-
-silverAlert = trans_minio_silver_alert(bronzeAlert)
-
-stagingAlert = ins_postgres_staging_alert(silverAlert)
-
-running = update_pipeline_running()
-
-dbt_job = run_dbt()
-
-success = update_pipeline_success()
-
-clean_bronze = cleanup_bronze_files()
-
-clean_silver = cleanup_silver_files()
-
-running >> [bronzeForecast, bronzeAlert]
-
-[stagingForecast, stagingAlert] >> dbt_job >> success >> [clean_bronze, clean_silver]
-```
-
-<img width="1065" height="808" alt="weather_data_pipeline-graph (1)" src="https://github.com/user-attachments/assets/50da362f-c760-46e0-b048-3127cdbc5238" />
+<img width="1257" height="841" alt="weather_data_pipeline-graph (2)" src="https://github.com/user-attachments/assets/8aae0d6c-ee65-4712-8e37-34c287508ba2" />
 
 ---
 
 ## dbt 建模
 
-資料進入 PostgreSQL 後，由 dbt 進行轉換。
-
-產生：
+資料載入資料倉儲後，由 dbt 進行資料轉換與建模。
 
 ### Staging Layer (Views)：資料清洗與標準化
-
-Basic data cleansing, standardization and type conversion.
 
 - stg_weather_forecast
 - stg_weather_alert
 
 ### Intermediate Layer (Ephemeral Models)：商業邏輯轉換
 
-Business transformations, aggregations and reusable logic compiled into CTEs at runtime.
-
 - eph_weather_forecast
 - eph_weather_alert
 
 ### Mart Layer (Tables)：資料倉儲模型，提供 BI 與資料分析使用
-
-Business-ready dimensional models for analytics and reporting.
 
 #### Dimension Tables
 
@@ -396,40 +364,6 @@ dbt run
 dbt docs generate
 dbt docs serve
 ```
-
-### 切換 dbt Target
-
-dbt Model 的輸出位置由 `~/.dbt/profiles.yml` 中的 `database` 與 `schema` 設定決定。
-
-開啟設定檔：
-
-```bash
-code ~/.dbt/profiles.yml
-```
-
-例如：
-
-```yaml
-outputs:
-  dev:
-    database: test
-    schema: mart
-```
-
-執行後 Model 會建立於：
-
-```text
-test.mart
-```
-
-若需切換輸出位置，只需修改：
-
-```yaml
-database: analytics
-schema: mart
-```
-
-> Source 定義資料來源位置；Target 決定 dbt Model 的輸出位置。
 
 ---
 

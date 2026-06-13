@@ -1,18 +1,21 @@
 
 import pandas as pd
 from datetime import datetime
-from google.cloud import bigquery
-from airflow.providers.postgres.hooks.postgres import PostgresHook
-from include.config.constant import bigquery_json, bigquery_project, bigquery_dataset
+from include.config.constant import bigquery_project, bigquery_dataset
+from include.storage.postgres_storage import PostgresStorage
+from include.storage.bigquery_storage import BigQueryStorage
+
+postgres_storage = PostgresStorage()
+bigquery_storage = BigQueryStorage(
+    project = bigquery_project,
+    dataset = bigquery_dataset
+)
 
 def load_bigquery_alert(batch_time: str) -> None:
 
     table_name = 'staging_alert'
 
-    hook = PostgresHook(postgres_conn_id = 'postgres_localhost')
-    conn = hook.get_conn()
-    cursor = conn.cursor()
-    cursor.execute(
+    rows = postgres_storage.get_records(
         f"""
         SELECT event, level, area, start_time, end_time, batch_time
           FROM public.{table_name}
@@ -20,7 +23,6 @@ def load_bigquery_alert(batch_time: str) -> None:
         """,
         (batch_time,)
     )
-    rows = cursor.fetchall()
 
     df = pd.DataFrame(
         data=rows,
@@ -34,18 +36,11 @@ def load_bigquery_alert(batch_time: str) -> None:
         ]
     )
     df["update_time"] = datetime.now()
-    
-    client = bigquery.Client.from_service_account_json(bigquery_json)
-    bigquery_table_id = f"{bigquery_project}.{bigquery_dataset}.{table_name}"
-    errors = client.load_table_from_dataframe(
-        df,
-        bigquery_table_id
-    )
 
-    if errors:
-        print(errors)
-    else:
-        print(f"Inserted {len(df)} rows")
+    bigquery_storage.load_data(
+        table_name,
+        df
+    )
 
 if __name__ == "__main__":
     load_bigquery_alert(batch_time='2026-06-01 17:56:20.000')

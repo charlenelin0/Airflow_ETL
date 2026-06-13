@@ -11,6 +11,7 @@ def trans_to_df(data: dict) -> pd.DataFrame:
     # get info & save into csv
     for item in data['records']['info']:
 
+        level = None
         start_time = item['onset']
         end_time = item['expires']
         event = item['event']

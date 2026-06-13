@@ -1,21 +1,19 @@
 
 from datetime import datetime, timedelta, timezone
-from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from tempfile import NamedTemporaryFile
 from include.config.constant import minio_conn_id, bronze_bucket_name
+from include.storage.minio_storage import MinioStorage
 
 import logging
 import json
 
-def get_json_from_minio(object_name: str) -> str:
+bronze_storage = MinioStorage(
+    bucket_name = bronze_bucket_name,
+    aws_conn_id = minio_conn_id
+)
 
-    s3_hook = S3Hook(aws_conn_id = minio_conn_id)
-    json_str = s3_hook.read_key(
-        key = object_name,
-        bucket_name = bronze_bucket_name
-    )
-    
-    return json_str
+def get_json_from_minio(object_name: str) -> str:
+    return bronze_storage.read_text(object_name)
 
 def upload_json_to_minio(batch_datetime: str, data: dict, object_name: str) -> str:
 
@@ -32,14 +30,10 @@ def upload_json_to_minio(batch_datetime: str, data: dict, object_name: str) -> s
         logging.info('Save data into json file: %s', temp_filename)
 
         # 2. save into minio
-        s3_hook = S3Hook(aws_conn_id = minio_conn_id)
-        s3_hook.load_file(
-            filename = temp_filename,
-            key = minio_filename,
-            bucket_name = bronze_bucket_name,
-            replace = True
+        bronze_storage.upload_file(
+            temp_filename,
+            minio_filename
         )
-        logging.info('Json file %s has been pushed into S3', minio_filename)
         
         return minio_filename
 
@@ -47,10 +41,7 @@ def delete_json_from_minio() -> None:
 
     delete_files = []
 
-    s3_hook = S3Hook(aws_conn_id = minio_conn_id)
-    keys = s3_hook.list_keys(
-        bucket_name = bronze_bucket_name
-    )
+    keys = bronze_storage.list_files()
 
     cutoff_date = (
         datetime.now(timezone.utc) 
@@ -67,7 +58,4 @@ def delete_json_from_minio() -> None:
             delete_files.append(file)
 
     if len(delete_files) > 0:
-        s3_hook.delete_objects(
-            bucket = bronze_bucket_name,
-            keys = delete_files
-        )
+        bronze_storage.delete_files(delete_files)

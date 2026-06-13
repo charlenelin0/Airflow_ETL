@@ -1,3 +1,4 @@
+
 from datetime import datetime, timedelta
 
 from airflow.operators.python import get_current_context
@@ -60,8 +61,7 @@ def weather_data_pipeline() -> None:
 
     @task()
     def update_pipeline_running() -> None:
-        context = get_current_context()
-        dag_id = context['dag'].dag_id
+        dag_id = get_current_context()['dag'].dag_id
         update_pipeline_state(
             pipeline_name = dag_id,
             status = 'RUNNING'
@@ -78,9 +78,7 @@ def weather_data_pipeline() -> None:
         # call api get data
         api_data = get_temp_api()
         
-        # get current flow time 
-        context = get_current_context()
-        batch_datetime = context['ts']
+        batch_datetime = get_current_context()['ts']
 
         # upload to minio bronze
         filename = upload_json_to_minio(
@@ -99,10 +97,6 @@ def weather_data_pipeline() -> None:
 
         bronze_filename = bronze['bronzeFile']
 
-        # get current flow time 
-        context = get_current_context()
-        batch_datetime = context['ts']
-
         # get file from bronze
         json_str = get_json_from_minio(
             object_name = bronze_filename
@@ -113,6 +107,8 @@ def weather_data_pipeline() -> None:
 
         # trans json into dataframe
         df = trans_temp(data)
+
+        batch_datetime = get_current_context()['ts']
 
         # upload to minio silver
         object_name = bronze['objectName']
@@ -133,9 +129,7 @@ def weather_data_pipeline() -> None:
             object_name = silver_filename
         )
 
-        # get current flow time 
-        context = get_current_context()
-        batch_datetime = context['ts']
+        batch_datetime = get_current_context()['ts']
 
         try:
             extract_temp_staging(tmp_dir, batch_datetime)
@@ -149,10 +143,8 @@ def weather_data_pipeline() -> None:
 
         # call api get data
         api_data = get_temp_alert_api()
-        
-        # get flow time 
-        context = get_current_context()
-        batch_datetime = context['ts']
+
+        batch_datetime = get_current_context()['ts']
 
         # upload to minio bronze
         filename = upload_json_to_minio(
@@ -171,10 +163,6 @@ def weather_data_pipeline() -> None:
 
         bronze_filename = bronze['bronzeFile']
 
-        # get flow time
-        context = get_current_context()
-        batch_datetime = context['ts']
-
         # get file from bronze
         json_str = get_json_from_minio(
             object_name = bronze_filename
@@ -185,6 +173,8 @@ def weather_data_pipeline() -> None:
 
         # trans json into dataframe
         df = trans_temp_alert(data)
+
+        batch_datetime = get_current_context()['ts']
 
         # upload to minio silver
         objectName = bronze['objectName']
@@ -205,9 +195,7 @@ def weather_data_pipeline() -> None:
             object_name = silver_filename
         )
 
-        # get flow time
-        context = get_current_context()
-        batch_datetime = context['ts']
+        batch_datetime = get_current_context()['ts']
 
         try:
             extract_temp_alert_staging(tmp_dir, batch_datetime)
@@ -216,20 +204,12 @@ def weather_data_pipeline() -> None:
 
     @task()
     def ins_bigquery_staging_forecast() -> None:
-
-        # get flow time
-        context = get_current_context()
-        batch_datetime = context['ts']
-
+        batch_datetime = get_current_context()['ts']
         load_temp_bigquery(batch_time = batch_datetime)
     
     @task()
     def ins_bigquery_staging_alert() -> None:
-        
-        # get flow time
-        context = get_current_context()
-        batch_datetime = context['ts']
-
+        batch_datetime = get_current_context()['ts']
         load_alert_bigquery(batch_time = batch_datetime)
 
     @task(on_failure_callback=[failure_email])
@@ -248,9 +228,9 @@ def weather_data_pipeline() -> None:
     
     @task()
     def update_pipeline_success() -> None:
-        context = get_current_context()
-        dag_id = context['dag'].dag_id
-        batch_datetime = context['ts']
+
+        dag_id = get_current_context()['dag'].dag_id
+        batch_datetime = get_current_context()['ts']
 
         row_count_fcst = get_row_count('staging_forecast', batch_datetime)
         row_count_alert = get_row_count('staging_alert', batch_datetime)
@@ -296,8 +276,8 @@ def weather_data_pipeline() -> None:
     # flow
     running >> [bronzeForecast, bronzeAlert]
 
-    stagingAlert >> bigqueryForecast
-    stagingForecast >> bigqueryAlert
+    stagingForecast >> bigqueryForecast
+    stagingAlert >> bigqueryAlert
     
     [bigqueryForecast, bigqueryAlert] >> dbt_job
     dbt_job >> success

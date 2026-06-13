@@ -1,27 +1,31 @@
 
 from datetime import datetime
+from include.storage.postgres_storage import PostgresStorage
 
-from airflow.providers.postgres.hooks.postgres import PostgresHook
+postgres_storage = PostgresStorage()
 
 def get_pipeline_state(pipeline_name: str) -> dict | None:
 
-    hook = PostgresHook(postgres_conn_id = 'postgres_localhost')
-
-    result = hook.get_first("""
+    sql = """
     SELECT status, last_processed_at, row_count
       FROM public.etl_pipeline_state
      WHERE pipeline_name = %s
-    """,
-    parameters = (pipeline_name,)
+    """
+
+    result = postgres_storage.get_first(
+        sql,
+        (pipeline_name,)
     )
 
     if result is None:
         return None
 
+    status, last_processed_at, row_count = result
+
     return {
-        'status': result[0],
-        'last_processed_at': result[1],
-        'row_count': result[2]
+        'status': status,
+        'last_processed_at': last_processed_at,
+        'row_count': row_count
     }
 
 def update_pipeline_state(
@@ -31,25 +35,20 @@ def update_pipeline_state(
     last_processed_at = None
     ) -> None:
 
-    hook = PostgresHook(postgres_conn_id = 'postgres_localhost')
-    conn = hook.get_conn()
-    cursor = conn.cursor()
-
     sql = """
     UPDATE public.etl_pipeline_state
-       SET status = %s,
-           row_count = COALESCE(%s, row_count),
-           last_processed_at = COALESCE(%s, last_processed_at),
-           last_run_at = CASE 
-                              WHEN %s = 'RUNNING'
-                              THEN CURRENT_TIMESTAMP
-                              ELSE last_run_at
-                          END,
+    SET status = %s,
+        row_count = COALESCE(%s, row_count),
+        last_processed_at = COALESCE(%s, last_processed_at),
+        last_run_at = CASE 
+                            WHEN %s = 'RUNNING'
+                            THEN CURRENT_TIMESTAMP
+                            ELSE last_run_at
+                        END,
             updated_at = CURRENT_TIMESTAMP 
-     WHERE pipeline_name = %s
+    WHERE pipeline_name = %s
     """
-
-    cursor.execute(
+    postgres_storage.execute(
         sql, 
         (
             status,
@@ -59,8 +58,6 @@ def update_pipeline_state(
             pipeline_name,
         )
     )
-
-    conn.commit()
 
 def get_row_count(
     table_name: str,
@@ -75,15 +72,19 @@ def get_row_count(
     if table_name not in valid_tables:
         raise ValueError(f"Invalid table name: {table_name}")
 
-    hook = PostgresHook(postgres_conn_id = 'postgres_localhost')
-
-    result = hook.get_first(f"""
+    sql = f"""
     SELECT count(*)
       FROM public.{table_name}
      WHERE batch_time = %s
-    """,
-    parameters = (batch_datetime,)
+    """
+
+    result = postgres_storage.get_first(
+        sql,
+        (batch_datetime,)
     )
+
+    if result is None:
+        return 0
 
     return result[0]
 

@@ -1,23 +1,26 @@
 
 from datetime import datetime, timedelta, timezone
-from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from tempfile import NamedTemporaryFile, TemporaryDirectory, mkdtemp
 from include.config.constant import minio_conn_id, silver_bucket_name
+from include.storage.minio_storage import MinioStorage
+from pathlib import Path
 
 import logging
 import pandas as pd
 
-def get_parquet_from_minio(object_name: str) -> str:
+silver_storage = MinioStorage(
+    bucket_name = silver_bucket_name,
+    aws_conn_id = minio_conn_id
+)
 
-    tmp_dir = mkdtemp()
+def get_parquet_from_minio(object_name: str) -> Path:
 
-    s3_hook = S3Hook(aws_conn_id = minio_conn_id)
-    s3_hook.download_file(
-        key = object_name,
-        bucket_name = silver_bucket_name,
-        local_path = tmp_dir
+    tmp_dir = Path(mkdtemp())
+    silver_storage.download_file(
+        object_name,
+        str(tmp_dir)
     )
-        
+
     return tmp_dir
 
 def upload_parquet_to_minio(df: pd.DataFrame, batch_datetime: str, object_name: str) -> str:
@@ -35,14 +38,10 @@ def upload_parquet_to_minio(df: pd.DataFrame, batch_datetime: str, object_name: 
         logging.info('Save data into parquet file: %s', temp_filename)
 
         # 2. save into minio
-        s3_hook = S3Hook(aws_conn_id = minio_conn_id)
-        s3_hook.load_file(
-            filename = temp_filename,
-            key = minio_filename,
-            bucket_name = silver_bucket_name,
-            replace = True
+        silver_storage.upload_file(
+            temp_filename,
+            minio_filename
         )
-        logging.info('Parquet file %s has been pushed into S3', minio_filename)
         
         return minio_filename
 
@@ -50,10 +49,7 @@ def delete_parquet_from_minio() -> None:
 
     delete_files = []
 
-    s3_hook = S3Hook(aws_conn_id = minio_conn_id)
-    keys = s3_hook.list_keys(
-        bucket_name = silver_bucket_name
-    )
+    keys = silver_storage.list_files()
 
     cutoff_date = (
         datetime.now(timezone.utc) 
@@ -70,7 +66,4 @@ def delete_parquet_from_minio() -> None:
             delete_files.append(file)
 
     if len(delete_files) > 0:
-        s3_hook.delete_objects(
-            bucket = silver_bucket_name,
-            keys = delete_files
-        )
+        silver_storage.delete_files(delete_files)

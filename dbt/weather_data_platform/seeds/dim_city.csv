@@ -1,0 +1,21 @@
+city_id,city_name,country,latitude,longitude,timezone,is_active
+1,Taipei,TW,25.0330,121.5654,Asia/Taipei,1
+2,New Taipei,TW,25.0169,121.4628,Asia/Taipei,1
+3,Taichung,TW,24.1477,120.6736,Asia/Taipei,1
+4,Tainan,TW,22.9997,120.2270,Asia/Taipei,1
+5,Kaohsiung,TW,22.6273,120.3014,Asia/Taipei,1
+6,Hsinchu,TW,24.8138,120.9675,Asia/Taipei,1
+7,Tokyo,JP,35.6762,139.6503,Asia/Tokyo,1
+8,Osaka,JP,34.6937,135.5023,Asia/Tokyo,1
+9,Kyoto,JP,35.0116,135.7681,Asia/Tokyo,1
+10,Yokohama,JP,35.4437,139.6380,Asia/Tokyo,1
+11,Nagoya,JP,35.1815,136.9066,Asia/Tokyo,1
+12,Fukuoka,JP,33.5904,130.4017,Asia/Tokyo,1
+13,Seoul,KR,37.5665,126.9780,Asia/Seoul,1
+14,Busan,KR,35.1796,129.0756,Asia/Seoul,1
+15,Incheon,KR,37.4563,126.7052,Asia/Seoul,1
+16,Singapore,SG,1.3521,103.8198,Asia/Singapore,1
+17,Bangkok,TH,13.7563,100.5018,Asia/Bangkok,1
+18,Kuala Lumpur,MY,3.1390,101.6869,Asia/Kuala_Lumpur,1
+19,Jakarta,ID,-6.2088,106.8456,Asia/Jakarta,1
+20,Manila,PH,14.5995,120.9842,Asia/Manila,1

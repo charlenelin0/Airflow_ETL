@@ -16,6 +16,15 @@ class BigQueryStorage:
         self._project = project
         self._dataset = dataset
 
+    def get_data(
+        self,
+        sql_query: str
+    ) -> pd.DataFrame:
+        
+        query_job = self._client.query(sql_query)
+
+        return query_job.result().to_dataframe()
+
     def load_data(
         self,
         table: str,

@@ -7,3 +7,4 @@ dbt-core
 dbt-postgres
 dbt-bigquery
 google-cloud-bigquery
+pyspark

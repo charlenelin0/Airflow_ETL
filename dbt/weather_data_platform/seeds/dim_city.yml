@@ -1,0 +1,35 @@
+version: 2
+
+seeds:
+  - name: dim_city
+    config:
+      tags:
+        - dim
+        - city
+
+    description: City dimension table for weather analytics.
+
+    columns:
+      - name: city_id
+        description: City identifier.
+        tests:
+          - unique
+          - not_null
+
+      - name: city_name
+        description: City name.
+
+      - name: country
+        description: Country code.
+
+      - name: latitude
+        description: Latitude.
+
+      - name: longitude
+        description: Longitude.
+
+      - name: timezone
+        description: Timezone.
+
+      - name: is_active
+        description: Active flag.

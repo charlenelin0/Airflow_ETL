@@ -22,7 +22,3 @@
 
 * [Risk or blocker]
 * [Risk or blocker]
-
-## Pending Confirmation
-
-* [Items that could not be verified]

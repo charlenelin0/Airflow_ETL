@@ -9,7 +9,7 @@ metadata:
 
 Generate a management-level weekly report from repository activity and project documentation.
 
-Focus on project outcomes, progress, risks, and pending work rather than implementation details.
+Focus on project outcomes, progress, and pending work rather than implementation details.
 
 # Workflow
 
@@ -25,7 +25,6 @@ Focus on project outcomes, progress, risks, and pending work rather than impleme
 
    * Completed work
    * In-progress work
-   * Risks, blockers, and unresolved issues
 
 6. Generate a weekly report following references/weekly_report_template.md.
 

@@ -26,3 +26,8 @@ jobs:
       - name: Check Python Syntax
         run: |
           python -m compileall dags
+      
+      - name: dbt Compile
+        run: |
+          cd dbt/weather_data_platform
+          dbt compile

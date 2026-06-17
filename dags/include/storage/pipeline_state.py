@@ -1,5 +1,4 @@
 
-from datetime import datetime
 from include.storage.postgres_storage import PostgresStorage
 
 postgres_storage = PostgresStorage()

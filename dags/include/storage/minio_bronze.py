@@ -12,17 +12,38 @@ bronze_storage = MinioStorage(
     aws_conn_id = minio_conn_id
 )
 
-def get_json_from_minio(object_name: str) -> str:
+def get_bronze_json(batch_date: str, object_name: str) -> list[dict]:
+    
+    files = bronze_storage.list_files(
+        prefix = f'bronze/weather/{object_name}/date={batch_date}/',
+        recursive = True
+    )
+
+    json_context = []
+    for file_name in files:
+        country = (
+            file_name
+            .split('/')[-1]
+            .replace('country=', '')
+            .replace('.json', '')
+        )
+        context = json.loads(get_json_file_context(file_name))
+        context['country'] = country
+        json_context.append(context)
+    
+    return json_context
+
+def get_json_file_context(object_name: str) -> str:
     return bronze_storage.read_text(object_name)
 
-def upload_json_to_minio(batch_datetime: str, data: dict, object_name: str) -> str:
+def upload_json_to_minio(batch_date: str, data: dict, object_name: str, country: str) -> str:
 
     # create temp file & save into minio
-    with NamedTemporaryFile(mode='w', prefix = f'{batch_datetime}_', suffix = '.json') as f:
+    with NamedTemporaryFile(mode='w', prefix = f'{batch_date}_', suffix = '.json') as f:
 
         # 0. filenames
         temp_filename = f.name
-        minio_filename = f'weather/{object_name}_{batch_datetime}.json'
+        minio_filename = f'bronze/weather/{object_name}/date={batch_date}/country={country}.json'
 
         # 1. create temp file
         json.dump(data, f, indent=4)

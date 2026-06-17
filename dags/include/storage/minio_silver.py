@@ -1,6 +1,6 @@
 
 from datetime import datetime, timedelta, timezone
-from tempfile import NamedTemporaryFile, TemporaryDirectory, mkdtemp
+from tempfile import NamedTemporaryFile, mkdtemp
 from include.config.constant import minio_conn_id, silver_bucket_name
 from include.storage.minio_storage import MinioStorage
 from pathlib import Path

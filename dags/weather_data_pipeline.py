@@ -1,25 +1,24 @@
 
 from datetime import datetime, timedelta
+from pyspark.sql import SparkSession
 
-from airflow.operators.python import get_current_context
+from airflow.sdk import get_current_context
 from airflow.decorators import dag, task
 from airflow.providers.smtp.notifications.smtp import send_smtp_notification
 
-from include.api.weather_forecast.api_temp import request_api as get_temp_api
-from include.api.weather_forecast.api_temp_alert import request_api as get_temp_alert_api
+from include.api.weather_forecast.api_meteo import get_city_coordinates, get_weather_info
 
-from include.storage.minio_bronze import get_json_from_minio, upload_json_to_minio, delete_json_from_minio
+from include.storage.minio_bronze import get_bronze_json, upload_json_to_minio, delete_json_from_minio
 from include.storage.minio_silver import get_parquet_from_minio, upload_parquet_to_minio, delete_parquet_from_minio
 from include.storage.pipeline_state import update_pipeline_state, get_row_count
 
-from include.transform.transform_temp import trans_to_df as trans_temp
-from include.transform.transform_temp_alert import trans_to_df as trans_temp_alert
+from include.transform.transform_temperature import trans_to_df as transform_temperature
+from include.transform.transform_rain import trans_to_df as transform_rain
 from include.transform.extract_temp_staging import insert_into_local_staging as extract_temp_staging
 from include.transform.extract_temp_alert_staging import insert_into_local_staging as extract_temp_alert_staging
 from include.transform.load_bigquery_alert import load_bigquery_alert as load_alert_bigquery
 from include.transform.load_bigquery_forecast import load_bigquery_forecast as load_temp_bigquery
 
-import json
 import subprocess
 import shutil
 
@@ -71,50 +70,67 @@ def weather_data_pipeline() -> None:
         multiple_outputs = True, 
         on_failure_callback = [failure_email]
     )
-    def scrape_weatherforecast() -> dict[str, str]:
+    def scrape_weatherforecast(variable) -> dict[str, str]:
 
-        object_name = "temperature"
+        weather_variable = variable['weather_variable']
 
-        # call api get data
-        api_data = get_temp_api()
+        object_name = variable['file_name_prefix']
+
+        batch_date = get_current_context()['ds']
+
+        # get data and push into bronze layer
+        cities = get_city_coordinates()
+
+        for city in cities:
+
+            api_data = get_weather_info(
+                latitude = city.latitude,
+                longitude = city.longitude,
+                weather_variable = weather_variable
+            )
         
-        batch_datetime = get_current_context()['ts']
+            file_name = upload_json_to_minio(
+                batch_datetime = batch_date, 
+                data = api_data, 
+                object_name = object_name,
+                country = city.country
+            )
 
-        # upload to minio bronze
-        filename = upload_json_to_minio(
-            batch_datetime = batch_datetime, 
-            data = api_data, 
-            object_name = object_name
-        )
-
-        return {
-            'bronzeFile': f'{filename}',
-            'objectName': f'{object_name}',
-        }
+        return {'objectName': f'{object_name}'}
 
     @task()
     def trans_minio_silver_forecast(bronze) -> dict[str]:
 
-        bronze_filename = bronze['bronzeFile']
+        batch_date = get_current_context()['ds']
+
+        object_name = bronze['objectName']
 
         # get file from bronze
-        json_str = get_json_from_minio(
-            object_name = bronze_filename
+        bronze_json = get_bronze_json(
+            batch_date = batch_date,
+            object_name = object_name
         )
 
-        # convert into python dict
-        data = json.loads(json_str)
-
-        # trans json into dataframe
-        df = trans_temp(data)
-
-        batch_datetime = get_current_context()['ts']
+        # transform
+        TRANSFORM_MAPPING = {
+            "temperature": transform_temperature,
+            "rain": transform_rain
+        }
+        transform_func = TRANSFORM_MAPPING[object_name]
+        # spark
+        spark = (
+            SparkSession
+            .builder
+            .appName('silver')
+            .getOrCreate()
+        )
+        df = spark.createDataFrame(bronze_json)
+        df = transform_func(df)
 
         # upload to minio silver
-        object_name = bronze['objectName']
         filename = upload_parquet_to_minio(
             df = df,
-            batch_datetime = batch_datetime, 
+            batch_date = batch_date, 
             object_name = object_name
         )
 
@@ -135,82 +151,11 @@ def weather_data_pipeline() -> None:
             extract_temp_staging(tmp_dir, batch_datetime)
         finally:
             shutil.rmtree(tmp_dir)
-        
-    @task(multiple_outputs = True)
-    def scrape_hightempalert() -> dict[str, str]:
-
-        object_name = "temperature_alert"
-
-        # call api get data
-        api_data = get_temp_alert_api()
-
-        batch_datetime = get_current_context()['ts']
-
-        # upload to minio bronze
-        filename = upload_json_to_minio(
-            batch_datetime = batch_datetime,
-            data = api_data, 
-            object_name = object_name
-        )
-
-        return {
-            'bronzeFile': f'{filename}', 
-            'objectName': f'{object_name}'
-        }
-
-    @task()
-    def trans_minio_silver_alert(bronze) -> dict[str]:
-
-        bronze_filename = bronze['bronzeFile']
-
-        # get file from bronze
-        json_str = get_json_from_minio(
-            object_name = bronze_filename
-        )
-
-        # convert into python dict
-        data = json.loads(json_str)
-
-        # trans json into dataframe
-        df = trans_temp_alert(data)
-
-        batch_datetime = get_current_context()['ts']
-
-        # upload to minio silver
-        objectName = bronze['objectName']
-        filename = upload_parquet_to_minio(
-            df = df,
-            batch_datetime = batch_datetime, 
-            object_name = objectName
-        )
-
-        return {'silverFile': f'{filename}'}
-
-    @task()
-    def ins_postgres_staging_alert(silver) -> None:
-
-        silver_filename = silver['silverFile']
-
-        tmp_dir = get_parquet_from_minio(
-            object_name = silver_filename
-        )
-
-        batch_datetime = get_current_context()['ts']
-
-        try:
-            extract_temp_alert_staging(tmp_dir, batch_datetime)
-        finally:
-            shutil.rmtree(tmp_dir)
 
     @task()
     def ins_bigquery_staging_forecast() -> None:
         batch_datetime = get_current_context()['ts']
         load_temp_bigquery(batch_time = batch_datetime)
-    
-    @task()
-    def ins_bigquery_staging_alert() -> None:
-        batch_datetime = get_current_context()['ts']
-        load_alert_bigquery(batch_time = batch_datetime)
 
     @task(on_failure_callback=[failure_email])
     def run_dbt() -> None:
@@ -252,19 +197,29 @@ def weather_data_pipeline() -> None:
 
     running = update_pipeline_running()
 
-    # weather forecast
-    bronzeForecast = scrape_weatherforecast()
+    # temperature
+    bronzeForecast = scrape_weatherforecast(
+        {
+            'weather_variable': 'temperature_2m',
+            'file_name_prefix': 'temperature'
+        }
+    )
     silverForecast = trans_minio_silver_forecast(bronzeForecast)
     stagingForecast = ins_postgres_staging_forecast(silverForecast)
 
-    # high temperature alert
-    bronzeAlert = scrape_hightempalert()
-    silverAlert = trans_minio_silver_alert(bronzeAlert)
-    stagingAlert = ins_postgres_staging_alert(silverAlert)
+    # rain
+    bronzeRain = scrape_weatherforecast(
+        {
+            'weather_variable': 'rain',
+            'file_name_prefix': 'rain'
+        }
+    )
+    silverRain = trans_minio_silver_forecast(bronzeRain)
+    stagingRain = ins_postgres_staging_forecast(silverRain)
 
     # bigquery
     bigqueryForecast = ins_bigquery_staging_forecast()
-    bigqueryAlert = ins_bigquery_staging_alert()
+    bigqueryAlert = ins_bigquery_staging_forecast()
 
     dbt_job = run_dbt()
 
@@ -273,13 +228,17 @@ def weather_data_pipeline() -> None:
     clean_bronze = cleanup_bronze_files()
     clean_silver = cleanup_silver_files()
 
-    # flow
-    running >> [bronzeForecast, bronzeAlert]
+    # start flow
+    running >> [bronzeForecast, bronzeRain]
 
+    # bronze -> silver -> postgres (staging)
+
+    # postgres (staging) -> bigquery (warehouse)
     stagingForecast >> bigqueryForecast
-    stagingAlert >> bigqueryAlert
-    
+    stagingRain >> bigqueryAlert
     [bigqueryForecast, bigqueryAlert] >> dbt_job
+
+    # success & cleaing + reset
     dbt_job >> success
     success >> [clean_bronze, clean_silver]
 

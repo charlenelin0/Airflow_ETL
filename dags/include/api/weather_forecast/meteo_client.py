@@ -11,10 +11,10 @@ class MeteoApiClient:
         latitude: float,
         longitude: float,
         weather_variable: str,
-        past_days: int | 1 = 1
+        fcst_date: str
     ) -> dict:
 
-        url = f'{self._base_url}?latitude={latitude}&={longitude}&hourly={weather_variable}&past_days={past_days}'
+        url = f'{self._base_url}?latitude={latitude}&={longitude}&hourly={weather_variable}&timezone=Asia%2FTokyo&start_date={fcst_date}&end_date={fcst_date}'
         response = requests.get(
             url,
             timeout = 60

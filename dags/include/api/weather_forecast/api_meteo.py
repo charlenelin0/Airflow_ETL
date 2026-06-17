@@ -1,9 +1,10 @@
 
 from include.api.weather_forecast.meteo_client import MeteoApiClient
 from include.storage.bigquery_storage import BigQueryStorage
-from include.constant import bigquery_project, bigquery_dataset
+from include.config.constant import bigquery_project, bigquery_dataset
+from include.models.city_coordinate import City
 
-import panadas as pd 
+import pandas as pd 
 
 meteoApi = MeteoApiClient()
 bigquery = BigQueryStorage(
@@ -11,20 +12,27 @@ bigquery = BigQueryStorage(
     bigquery_dataset
 )
 
-def get_weather_info() -> None:
-
+def get_city_coordinates() -> list[City]:
+    
     sql = f"""
-    SELECT latitude, longitude
+    SELECT country, latitude, longitude
       FROM dim_city
      WHERE is_active = 1
     """
+    
+    df = bigquery.get_date(sql)
 
-    weather = []
-
-    result = bigquery.get_date(sql)
-
-    for row in result.itertuples(index=False):
-        res_json = meteoApi.fetch(
-            row.latitude,
-            row.longitude
+    return [
+        City(
+            countrys = row.country,
+            latitude = row.latitude,
+            longitude = row.longitude
         )
+        for row in df.itertuples()
+    ]
+
+def get_weather_info(latitude: float, longitude: float, weather_variable: str) -> str:
+    return meteoApi.fetch(
+        latitude,
+        longitude
+    )

@@ -17,8 +17,3 @@
 
   * Current status:
   * Pending items:
-
-## Risks / Blockers
-
-* [Risk or blocker]
-* [Risk or blocker]

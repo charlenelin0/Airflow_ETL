@@ -1,0 +1,44 @@
+{
+  "name": "weather_spark_transform",
+  "airflow_connection_id": "databricks_conn",
+  "tasks": [
+    {
+      "task_key": "bronze_to_silver",
+      "notebook_task": {
+        "notebook_path": "/Repos/weather/weather_bronze_to_silver",
+        "base_parameters": {
+          "batch_date": "{{batch_date}}",
+          "batch_time": "{{batch_time}}",
+          "source_path": "{{source_path}}",
+          "target_schema": "silver"
+        }
+      },
+      "new_cluster": {
+        "spark_version": "15.4.x-scala2.12",
+        "node_type_id": "i3.xlarge",
+        "num_workers": 1
+      }
+    },
+    {
+      "task_key": "silver_to_gold",
+      "depends_on": [
+        {
+          "task_key": "bronze_to_silver"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "/Repos/weather/weather_silver_to_gold",
+        "base_parameters": {
+          "batch_date": "{{batch_date}}",
+          "source_table": "silver.weather_bronze_to_silver",
+          "target_schema": "gold"
+        }
+      },
+      "new_cluster": {
+        "spark_version": "15.4.x-scala2.12",
+        "node_type_id": "i3.xlarge",
+        "num_workers": 1
+      }
+    }
+  ]
+}

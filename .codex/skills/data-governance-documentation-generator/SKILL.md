@@ -3,7 +3,7 @@ name: data-governance-documentation-generator
 description: Generate data governance documentation from PostgreSQL metadata, including data dictionary and schema overview.
 metadata:
   short-description: Generate data governance documentation from PostgreSQL
--------------------------------------------------------------------------
+---
 
 # Objective
 
@@ -48,9 +48,9 @@ Before execution, verify that the following MCP servers are available.
 
 If the Notion MCP server is configured but unavailable:
 
-* Run login_notion.sh
-* Recheck MCP availability before continuing.
-* Stop if the issue persists.
+* Attempt recovery using ./.codex/scripts/login_notion.sh
+* Wait for user authentication.
+* Continue execution.
 
 # Workflow
 

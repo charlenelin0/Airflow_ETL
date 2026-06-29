@@ -1,7 +1,10 @@
 
 from pyspark.sql import (
-    DataFrame, 
-    arrays_zip, 
+    DataFrame
+)
+
+from pyspark.sql.functions import(
+    arrays_zip,
     explode,
     col
 )

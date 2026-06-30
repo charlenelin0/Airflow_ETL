@@ -1,6 +1,4 @@
-
 from datetime import datetime, timedelta
-from pyspark.sql import SparkSession
 
 from airflow.sdk import get_current_context
 from airflow.decorators import dag, task
@@ -11,6 +9,7 @@ from include.api.weather_forecast.api_meteo import get_city_coordinates, get_wea
 from include.storage.minio_bronze import get_bronze_json, upload_json_to_minio, delete_json_from_minio
 from include.storage.minio_silver import get_parquet_from_minio, upload_parquet_to_minio, delete_parquet_from_minio
 from include.storage.pipeline_state import update_pipeline_state, get_row_count
+from include.databricks.upload_json import upload_json_to_databricks_volume
 
 from include.transform.transform_temperature import trans_to_df as transform_temperature
 from include.transform.transform_rain import trans_to_df as transform_rain
@@ -86,14 +85,21 @@ def weather_data_pipeline() -> None:
             api_data = get_weather_info(
                 latitude = city.latitude,
                 longitude = city.longitude,
-                weather_variable = weather_variable
+                weather_variable = weather_variable,
+                batch_date = batch_date
             )
         
-            file_name = upload_json_to_minio(
-                batch_datetime = batch_date, 
+            upload_json_to_minio(
+                batch_date = batch_date, 
                 data = api_data, 
                 object_name = object_name,
                 country = city.country
+            )
+            upload_json_to_databricks_volume(
+                batch_date = batch_date,
+                object_name = object_name,
+                country = city.country,
+                data = api_data
             )
 
         return {'objectName': f'{object_name}'}
@@ -117,15 +123,7 @@ def weather_data_pipeline() -> None:
             "rain": transform_rain
         }
         transform_func = TRANSFORM_MAPPING[object_name]
-        # spark
-        spark = (
-            SparkSession
-            .builder
-            .appName('silver')
-            .getOrCreate()
-        )
-        df = spark.createDataFrame(bronze_json)
-        df = transform_func(df)
+        df = transform_func(bronze_json)
 
         # upload to minio silver
         filename = upload_parquet_to_minio(

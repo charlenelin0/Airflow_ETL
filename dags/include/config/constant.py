@@ -24,3 +24,6 @@ databricks_silver_to_gold_notebook = "/Repos/weather/weather_silver_to_gold"
 databricks_silver_schema = "silver"
 databricks_gold_schema = "gold"
 databricks_silver_table = "silver.weather_bronze_to_silver"
+databricks_volume_weather_bronze_path = (
+    "/Volumes/workspace/default/airflow_json_landing/weather/bronze"
+)

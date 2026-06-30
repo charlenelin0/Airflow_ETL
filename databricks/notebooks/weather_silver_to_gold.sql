@@ -29,7 +29,7 @@ USING DELTA;
 -- COMMAND ----------
 
 DELETE FROM ${target_schema}.weather_daily_summary
-WHERE batch_date = DATE('${batch_date}');
+WHERE batch_date = TRY_CAST('$batch_date' AS DATE);
 
 -- COMMAND ----------
 
@@ -44,7 +44,7 @@ WITH temperature_daily AS (
     MAX(temperature) AS max_temperature,
     COUNT(*) AS temperature_record_count
   FROM ${temperature_source_table}
-  WHERE batch_date = DATE('${batch_date}')
+  WHERE batch_date = TRY_CAST('$batch_date' AS DATE)
   GROUP BY country, DATE(weather_time), batch_date
 ),
 rain_daily AS (
@@ -55,7 +55,7 @@ rain_daily AS (
     SUM(rain) AS total_rain,
     COUNT(*) AS rain_record_count
   FROM ${rain_source_table}
-  WHERE batch_date = DATE('${batch_date}')
+  WHERE batch_date = TRY_CAST('$batch_date' AS DATE)
   GROUP BY country, DATE(weather_time), batch_date
 ),
 joined_daily AS (
@@ -97,8 +97,8 @@ FROM joined_daily;
 -- COMMAND ----------
 
 SELECT
-  '${batch_date}' AS batch_date,
+  '$batch_date' AS batch_date,
   '${target_schema}.weather_daily_summary' AS target_table,
   COUNT(*) AS row_count
 FROM ${target_schema}.weather_daily_summary
-WHERE batch_date = DATE('${batch_date}');
+WHERE batch_date = TRY_CAST('$batch_date' AS DATE);

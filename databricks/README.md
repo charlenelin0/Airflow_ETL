@@ -21,7 +21,7 @@ Airflow scrape tasks
 databricks/
   notebooks/
     weather_bronze_to_silver.py
-    weather_silver_to_gold.py
+    weather_silver_to_gold.sql
   jobs/
     weather_transform_job.json
 ```

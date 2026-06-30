@@ -37,7 +37,11 @@ def read_bronze_json(source_path: str):
         spark.read
         .option("multiLine", "true")
         .json(source_path)
-        .withColumn("source_file", F.input_file_name())
+        .withColumn("source_file", F.col("_metadata.file_path"))
+        .withColumn(
+            "country",
+            F.regexp_extract(F.col("source_file"), r"country=([^/]+)\.json$", 1),
+        )
     )
 
 

@@ -1,31 +1,14 @@
 
-from pyspark.sql import (
-    DataFrame
-)
+import pandas as pd
 
-from pyspark.sql.functions import(
-    arrays_zip,
-    explode,
-    col
-)
+def trans_to_df(raw_data: str) -> pd.DataFrame:
 
-def trans_to_df(df: DataFrame) -> DataFrame:
-    return (
-        df
-        .withColumn(
-            "weather",
-            explode(
-                arrays_zip(
-                    "hourly.time",
-                    "hourly.temperature_2m"
-                )
-            )
-        ).select(
-            "country",
-            "latitude",
-            "longitude",
-            col('hourly_units.temperature_2m').alias('unit'),
-            col("weather.time").alias('datetime'),
-            col("weather.temperature_2m").alias('temperature'),
-        )
-    )
+    df = pd.DataFrame(raw_data)
+
+    df['hourly_time'] = df['hourly'].apply(lambda x: x['time'])
+    df['hourly_temp'] = df['hourly'].apply(lambda x: x['temperature_2m'])
+
+    df_filtered = df[['latitude', 'longitude', 'country', 'hourly_time', 'hourly_temp']]
+    df_final = df_filtered.explode(['hourly_time', 'hourly_temp']).reset_index(drop=True)
+
+    return df_final

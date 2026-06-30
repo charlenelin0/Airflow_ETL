@@ -14,11 +14,11 @@ class MeteoApiClient:
         fcst_date: str
     ) -> dict:
 
-        url = f'{self._base_url}?latitude={latitude}&={longitude}&hourly={weather_variable}&timezone=Asia%2FTokyo&start_date={fcst_date}&end_date={fcst_date}'
+        url = f'{self._base_url}?latitude={latitude}&longitude={longitude}&hourly={weather_variable}&timezone=Asia%2FTokyo&start_date={fcst_date}&end_date={fcst_date}'
         response = requests.get(
             url,
             timeout = 60
         )
         response.raise_for_status()
         
-        return request.json()
+        return response.json()

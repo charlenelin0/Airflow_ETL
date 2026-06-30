@@ -63,14 +63,12 @@ class MinioStorage:
 
     def list_files(
         self,
-        prefix: str | None = None,
-        recursive: bool = False
+        prefix: str | None = None
     ) -> list[str]:
 
         return self._s3_hook.list_keys(
             bucket_name = self._bucket_name,
-            prefix = prefix,
-            recursive = recursive
+            prefix = prefix
         ) or []
 
     def delete_files(

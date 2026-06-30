@@ -15,8 +15,7 @@ bronze_storage = MinioStorage(
 def get_bronze_json(batch_date: str, object_name: str) -> list[dict]:
     
     files = bronze_storage.list_files(
-        prefix = f'bronze/weather/{object_name}/date={batch_date}/',
-        recursive = True
+        prefix = f'bronze/weather/{object_name}/date={batch_date}/'
     )
 
     json_context = []

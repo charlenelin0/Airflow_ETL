@@ -23,14 +23,14 @@ def get_parquet_from_minio(object_name: str) -> Path:
 
     return tmp_dir
 
-def upload_parquet_to_minio(df: pd.DataFrame, batch_datetime: str, object_name: str) -> str:
+def upload_parquet_to_minio(df: pd.DataFrame, batch_date: str, object_name: str) -> str:
 
     # create temp file & save into minio
-    with NamedTemporaryFile(mode = 'wb', prefix = f'{batch_datetime}_', suffix = '.parquet') as f:
+    with NamedTemporaryFile(mode = 'wb', prefix = f'{batch_date}_', suffix = '.parquet') as f:
 
         # 0. get parameters
         temp_filename = f.name
-        minio_filename = f'weather/etl_{object_name}_{batch_datetime}.parquet'
+        minio_filename = f'weather/etl_{object_name}_{batch_date}.parquet'
 
         # 1. create temp file
         df.to_parquet(f, engine = 'pyarrow')

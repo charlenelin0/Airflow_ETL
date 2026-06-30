@@ -4,14 +4,9 @@
     config(materialized="table")
 }}
 
-select d.city_key,
-       a.area_key,
-       s.weather_date,
-       s.event,
-       s.level
-  from {{ ref('eph_weather_alert') }} s
-  join {{ ref('dim_city') }} d
-    on s.city = d.city
-  join {{ ref('dim_area') }} a
-    on s.city = a.city
-   and s.district = a.area
+select to_hex(md5(city || area || weather_date || event)) alert_key,
+       to_hex(md5(city || area)) area_key,
+       weather_date,
+       event,
+       level
+  from {{ ref('eph_weather_alert') }}

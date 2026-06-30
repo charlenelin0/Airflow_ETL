@@ -16,23 +16,25 @@ def get_city_coordinates() -> list[City]:
     
     sql = f"""
     SELECT country, latitude, longitude
-      FROM dim_city
+      FROM `{bigquery_project}.{bigquery_dataset}.dim_city`
      WHERE is_active = 1
     """
     
-    df = bigquery.get_date(sql)
+    df = bigquery.get_data(sql)
 
     return [
         City(
-            countrys = row.country,
+            country = row.country,
             latitude = row.latitude,
             longitude = row.longitude
         )
         for row in df.itertuples()
     ]
 
-def get_weather_info(latitude: float, longitude: float, weather_variable: str) -> str:
+def get_weather_info(latitude: float, longitude: float, weather_variable: str, batch_date: str) -> str:
     return meteoApi.fetch(
         latitude,
-        longitude
+        longitude,
+        weather_variable,
+        batch_date
     )

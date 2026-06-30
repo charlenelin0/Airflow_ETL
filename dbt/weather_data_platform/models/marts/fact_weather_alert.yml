@@ -3,28 +3,46 @@ version: 2
 models:
   - name: fact_weather_alert
     config:
-      tags:
-        - fact
-        - weather
-        - alert
+      tags: ["fact", "weather"]
     description: Fact table containing weather alert events.
+
+    meta:
+      owner: "Data Team"
+      business_owner: "Charlene Lin"
+      data_tier: "Tier_1"
 
     columns:
       - name: city_key
         description: Foreign key to dim_city.
+        data_type: string
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_city')
+              field: city_key
       
       - name: area_key 
         description: Foreign key to dim_city.
+        data_type: string
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_city')
+              field: area_key
       
       - name: weather_date 
         description: Alert date.
+        data_type: date
+        tests:
+          - not_null
 
       - name: event 
-        description: Weather alert event.
+        description: "Weather alert event."
+        data_type: string
 
       - name: level 
         description: Alert severity level.
+        data_type: string
+        tests:
+          - accepted_values:
+              values: [Extreme, Hot, Warm, Normal]

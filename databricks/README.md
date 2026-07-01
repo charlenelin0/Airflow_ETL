@@ -1,18 +1,17 @@
-# Databricks Spark Transform Layer
+# Databricks ETL Layer
 
-This folder contains the planned Databricks assets for the weather data pipeline.
+This folder contains Databricks platform ETL assets for the weather data pipeline.
 
-The initial goal is to add Databricks as a Spark transform layer without changing
-the existing Airflow, Postgres, BigQuery, or dbt flow.
+Airflow only lands raw JSON files into Databricks. The Databricks platform owns
+the notebook execution from bronze to silver and gold.
 
-## Planned Flow
+## Flow
 
 ```text
-Airflow scrape tasks
-  -> bronze weather files
-  -> Databricks Spark transform
-  -> Delta silver/gold tables
-  -> downstream validation or warehouse loading
+Airflow
+  -> Databricks Volume bronze JSON landing
+  -> Databricks notebook: bronze to silver
+  -> Databricks SQL notebook: silver to gold
 ```
 
 ## Folder Layout
@@ -22,25 +21,46 @@ databricks/
   notebooks/
     weather_bronze_to_silver.py
     weather_silver_to_gold.sql
-  jobs/
-    weather_transform_job.json
 ```
 
-## MVP Scope
+## Execution
 
-1. Trigger a Databricks job from Airflow.
-2. Pass `batch_date` and `batch_time` as job parameters.
-3. Read weather bronze files from a Databricks-readable location.
-4. Transform records with Spark.
-5. Write Delta tables for silver and gold layers.
+Databricks Workflows / Jobs are configured directly in the Databricks UI.
 
-## Airflow Connection
+They are not versioned in this repository for now. This keeps platform-side
+experimentation simple while the ETL design is still evolving.
 
-The Airflow side should use the existing Databricks connection id:
+Recommended task order:
 
 ```text
-databricks_conn
+weather_bronze_to_silver.py
+  -> weather_silver_to_gold.sql
 ```
 
-The connection should contain the Databricks workspace host and token/password.
+Use one shared workflow parameter:
+
+```text
+batch_date
+```
+
+Example task parameters:
+
+```text
+weather_bronze_to_silver.py
+  batch_date = {{job.parameters.batch_date}}
+  source_base_path = /Volumes/workspace/default/airflow_json_landing/weather/bronze
+  target_schema = silver
+
+weather_silver_to_gold.sql
+  batch_date = {{job.parameters.batch_date}}
+  temperature_source_table = silver.weather_temperature_hourly
+  rain_source_table = silver.weather_rain_hourly
+  target_schema = gold
+```
+
+## Airflow Boundary
+
+The Airflow side should only upload raw JSON to the Databricks Volume landing
+path using the existing connection id `databricks_conn`.
+
 Do not store Databricks credentials in this repository.

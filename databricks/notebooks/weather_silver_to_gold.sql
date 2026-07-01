@@ -7,11 +7,11 @@ CREATE WIDGET TEXT target_schema DEFAULT "gold";
 
 -- COMMAND ----------
 
-CREATE SCHEMA IF NOT EXISTS ${target_schema};
+CREATE SCHEMA IF NOT EXISTS IDENTIFIER(:target_schema);
 
 -- COMMAND ----------
 
-CREATE TABLE IF NOT EXISTS ${target_schema}.weather_daily_summary (
+CREATE TABLE IF NOT EXISTS IDENTIFIER(:target_schema || '.weather_daily_summary') (
   country STRING,
   weather_date DATE,
   avg_temperature DOUBLE,
@@ -28,12 +28,12 @@ USING DELTA;
 
 -- COMMAND ----------
 
-DELETE FROM ${target_schema}.weather_daily_summary
+DELETE FROM IDENTIFIER(:target_schema || '.weather_daily_summary')
 WHERE batch_date = TRY_CAST('$batch_date' AS DATE);
 
 -- COMMAND ----------
 
-INSERT INTO ${target_schema}.weather_daily_summary
+INSERT INTO IDENTIFIER(:target_schema || '.weather_daily_summary')
 WITH temperature_daily AS (
   SELECT
     country,
@@ -43,7 +43,7 @@ WITH temperature_daily AS (
     MIN(temperature) AS min_temperature,
     MAX(temperature) AS max_temperature,
     COUNT(*) AS temperature_record_count
-  FROM ${temperature_source_table}
+  FROM IDENTIFIER(:temperature_source_table)
   WHERE batch_date = TRY_CAST('$batch_date' AS DATE)
   GROUP BY country, DATE(weather_time), batch_date
 ),
@@ -54,7 +54,7 @@ rain_daily AS (
     batch_date,
     SUM(rain) AS total_rain,
     COUNT(*) AS rain_record_count
-  FROM ${rain_source_table}
+  FROM IDENTIFIER(:rain_source_table)
   WHERE batch_date = TRY_CAST('$batch_date' AS DATE)
   GROUP BY country, DATE(weather_time), batch_date
 ),
@@ -98,7 +98,7 @@ FROM joined_daily;
 
 SELECT
   '$batch_date' AS batch_date,
-  '${target_schema}.weather_daily_summary' AS target_table,
+  :target_schema || '.weather_daily_summary' AS target_table,
   COUNT(*) AS row_count
-FROM ${target_schema}.weather_daily_summary
+FROM IDENTIFIER(:target_schema || '.weather_daily_summary')
 WHERE batch_date = TRY_CAST('$batch_date' AS DATE);
